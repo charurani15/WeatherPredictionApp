@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WeatherPredictionApp</string>
+    <string name="fetching_current_location">Fetching Current Location</string>
+    <string name="requesting_location_permission">Requesting Current Location Permission</string>
+    <string name="requesting_location_access_rationale">We would like to know your current location to bring the best for you.</string>
+    <string name="ok">Ok</string>
+</resources>
