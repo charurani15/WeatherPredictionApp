@@ -2,7 +2,10 @@ package com.charurani.weatherpredictionapp.core.di.module
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.room.Room
 import com.charurani.weatherpredictionapp.app.Constants
+import com.charurani.weatherpredictionapp.app.datasource.database.WeatherPredictionDatabase
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -21,6 +24,16 @@ import javax.inject.Singleton
 
 @Module
 class ApplicationModule(val application: Application) {
+
+    private var database: WeatherPredictionDatabase
+
+    init {
+        database = Room.databaseBuilder(
+            application,
+            WeatherPredictionDatabase::class.java,
+            "weather_prediction_db"
+        ).fallbackToDestructiveMigration().build()
+    }
 
     @Provides
     @Singleton
@@ -105,7 +118,19 @@ class ApplicationModule(val application: Application) {
 
     @Provides
     @Named("appid")
-    fun provideAppId():String{
+    fun provideAppId(): String {
         return Constants.APP_ID
+    }
+
+    @Singleton
+    @Provides
+    fun provideAppDataBase(): WeatherPredictionDatabase {
+        return database
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(): SharedPreferences {
+        return application.getSharedPreferences("weatherPredictionApp", Context.MODE_PRIVATE)
     }
 }

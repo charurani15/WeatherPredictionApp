@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,9 +48,7 @@ class LocationFragment : Fragment() {
 
     private fun addObserverForLocation() {
         locationViewModel.location?.observe(viewLifecycleOwner, Observer { location ->
-            Log.e("charu", "location fragment")
             location?.let {
-                Log.e("charu", "location navigaition")
                 findNavController().navigate(
                     LocationFragmentDirections.actionLocationFragmentToListingFragment(
                         location.latitude.toFloat(),
@@ -116,8 +113,9 @@ class LocationFragment : Fragment() {
             when (grantResults[0]) {
                 PackageManager.PERMISSION_GRANTED ->
                     locationViewModel.getLocation(viewLifecycleOwner)
-                PackageManager.PERMISSION_DENIED ->
-                    Log.e("charu", "here")
+                PackageManager.PERMISSION_DENIED -> {
+                    //do nothing
+                }
             }
         }
     }

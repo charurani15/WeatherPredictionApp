@@ -4,5 +4,7 @@ import com.squareup.moshi.Json
 
 data class CityDataModel(
     @Json(name="name")
-    val name:String
+    val name:String,
+    @Json(name="coord")
+    val coordinatesModel: CoordinatesModel
 )

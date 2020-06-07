@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.lifecycle.LiveData
@@ -56,19 +55,15 @@ class GoogleApiClientLocationDataStore
     }
 
     override fun onConnectionSuspended(p0: Int) {
-        Log.e(GoogleApiClientLocationDataStore::class.java.simpleName, "On Connection Suspended")
+        //do nothing
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-        Log.e(GoogleApiClientLocationDataStore::class.java.simpleName, "On Connection Failed")
+        //do nothing
     }
 
     override fun onLocationChanged(location: Location?) {
         location?.let {
-            Log.e(
-                GoogleApiClientLocationDataStore::class.java.simpleName,
-                "onLocationChanged $location"
-            )
             lastLocation = location
             locationMutableLiveData.postValue(lastLocation)
         }
@@ -88,10 +83,6 @@ class GoogleApiClientLocationDataStore
         val locationSettingsStates = locationSettingsResult.locationSettingsStates
         when (status.statusCode) {
             LocationSettingsStatusCodes.SUCCESS -> {
-                Log.e(
-                    GoogleApiClientLocationDataStore::class.java.simpleName,
-                    "Location Code Success"
-                )
                 LocationServices.FusedLocationApi.requestLocationUpdates(
                     googleApiClient,
                     locationRequest,
@@ -99,10 +90,6 @@ class GoogleApiClientLocationDataStore
                 )
             }
             LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                Log.e(
-                    GoogleApiClientLocationDataStore::class.java.simpleName,
-                    "Location Code RESOLUTION_REQUIRED"
-                )
                 try {
                     if (context is Activity) {
                         status.startResolutionForResult(context, REQUEST_GPS_LOCATION)
@@ -112,10 +99,6 @@ class GoogleApiClientLocationDataStore
                 }
             }
             LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
-                Log.e(
-                    GoogleApiClientLocationDataStore::class.java.simpleName,
-                    "Location Code SETTINGS_CHANGE_UNAVAILABLE"
-                )
                 // Location settings are not satisfied. However, we have
                 // no way to fix the
                 // settings so we won't show the dialog.

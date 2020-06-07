@@ -1,21 +1,23 @@
 package com.charurani.weatherpredictionapp.app.view.main.listing
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.charurani.weatherpredictionapp.app.data.model.currentWeather.WeatherPredictionDataModel
+import androidx.lifecycle.*
+import com.charurani.weatherpredictionapp.app.data.entity.WeatherPredictionDataEntity
 import com.charurani.weatherpredictionapp.app.repository.GetWeatherDataRepository
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-class ListingViewModel @Inject constructor(val getWeatherDataRepository: GetWeatherDataRepository) :
+class ListingViewModel
+@Inject constructor(
+    private val getWeatherDataRepository: GetWeatherDataRepository
+) :
     ViewModel() {
 
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    private var _weatherPredictionDataModel = MutableLiveData<WeatherPredictionDataModel>()
-    val weatherPredictionDataModel: LiveData<WeatherPredictionDataModel>
-        get() = _weatherPredictionDataModel
+    private val _weatherPredictionDataEntityLiveData: MutableLiveData<List<WeatherPredictionDataEntity>> =
+        MutableLiveData<List<WeatherPredictionDataEntity>>()
+    val weatherPredictionDataEntityLiveData: LiveData<List<WeatherPredictionDataEntity>>
+        get() = _weatherPredictionDataEntityLiveData
 
     override fun onCleared() {
         super.onCleared()
@@ -24,20 +26,31 @@ class ListingViewModel @Inject constructor(val getWeatherDataRepository: GetWeat
 
     fun getWeatherPredictionList(
         latitude: Float,
-        longitude: Float
+        longitude: Float,
+        lifecycleOwner: LifecycleOwner
     ) {
         uiScope.launch {
-            val currentWeatherDataModel = getWeatherDataFromRepository(latitude, longitude)
-            _weatherPredictionDataModel.value = currentWeatherDataModel
+            try {
+                getWeatherDataRepository.latitude = latitude
+                getWeatherDataRepository.longitude = longitude
+                val currentWeatherDataModel = getWeatherDataFromRepository(latitude, longitude)
+                getWeatherDataRepository.weatherPredictionDataEntityLiveData?.observe(lifecycleOwner,
+                    Observer {
+                        _weatherPredictionDataEntityLiveData.value = it
+                    })
+                getWeatherDataRepository.getData(lifecycleOwner)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     private suspend fun getWeatherDataFromRepository(
         latitude: Float,
         longitude: Float
-    ): WeatherPredictionDataModel {
-        return withContext(Dispatchers.IO) {
-            getWeatherDataRepository.getWeatherPrediction(latitude, longitude).await()
+    ) {
+        withContext(Dispatchers.IO) {
+            getWeatherDataRepository.refreshWeatherPredictions(latitude, longitude)
         }
     }
 

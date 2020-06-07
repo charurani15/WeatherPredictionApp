@@ -2,7 +2,6 @@ package com.charurani.weatherpredictionapp.app.view.main.listing
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.charurani.weatherpredictionapp.app.WeatherPredictionApplication
-import com.charurani.weatherpredictionapp.app.data.model.currentWeather.PredictionListDataModel
+import com.charurani.weatherpredictionapp.app.data.entity.WeatherPredictionDataEntity
 import com.charurani.weatherpredictionapp.app.view.main.di.MainActivityModule
 import com.charurani.weatherpredictionapp.databinding.FragmentListingBinding
 import javax.inject.Inject
@@ -61,30 +60,31 @@ class ListingFragment : Fragment() {
     }
 
     private fun getWeatherData() {
-        viewModel.weatherPredictionDataModel.observe(
+        viewModel.weatherPredictionDataEntityLiveData.observe(
             viewLifecycleOwner,
-            Observer { weatherPredictionDataModelList ->
-                Log.e(
-                    "charu",
-                    "${weatherPredictionDataModelList.predictionListDataModelList.get(0).predictionMainModel.currentTemp}"
-                )
-                setVisibilityToView(predictionListLoadingPb, false)
-                setVisibilityToView(predictionList, true)
-                addDataToPredictionList(weatherPredictionDataModelList = weatherPredictionDataModelList.predictionListDataModelList)
+            Observer { weatherPredictionDataEntityList ->
+                weatherPredictionDataEntityList?.let {
+                    if(weatherPredictionDataEntityList.isNotEmpty()) {
+                        setVisibilityToView(predictionListLoadingPb, false)
+                        setVisibilityToView(predictionList, true)
+                        addDataToPredictionList(weatherPredictionDataEntityList = weatherPredictionDataEntityList)
+                    }
+                }
             })
         viewModel.getWeatherPredictionList(
             ListingFragmentArgs.fromBundle(arguments!!).latitude,
-            ListingFragmentArgs.fromBundle(arguments!!).longitude
+            ListingFragmentArgs.fromBundle(arguments!!).longitude,
+            viewLifecycleOwner
         )
     }
 
-    private fun addDataToPredictionList(weatherPredictionDataModelList: List<PredictionListDataModel>) {
+    private fun addDataToPredictionList(weatherPredictionDataEntityList: List<WeatherPredictionDataEntity>) {
         if (listingRecyclerViewAdapter == null) {
-            listingRecyclerViewAdapter = ListingRecyclerViewAdapter(weatherPredictionDataModelList)
+            listingRecyclerViewAdapter = ListingRecyclerViewAdapter(weatherPredictionDataEntityList)
             predictionList.adapter = listingRecyclerViewAdapter
         } else {
             listingRecyclerViewAdapter?.weatherPredictionDataModelList =
-                weatherPredictionDataModelList
+                weatherPredictionDataEntityList
         }
     }
 

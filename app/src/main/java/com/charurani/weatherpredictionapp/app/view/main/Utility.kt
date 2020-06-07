@@ -1,10 +1,8 @@
 package com.charurani.weatherpredictionapp.app.view.main
 
-import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
@@ -27,7 +25,6 @@ class Utility {
         @BindingAdapter("cloudinesss")
         @JvmStatic
         fun ImageView.setCloudinessImage(cloudiness: Int) {
-            Log.e("charu", "text is $cloudiness")
             when (cloudiness) {
                 in 0..30 -> setBackgroundResource(R.drawable.ic_cloud_30)
                 in 50..80 -> setBackgroundResource(R.drawable.ic_cloud_50)
